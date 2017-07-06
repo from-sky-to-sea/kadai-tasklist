@@ -1,7 +1,21 @@
 class TasksController < ApplicationController
+  
+  # index(一覧表示orユーザに対するタスク取得のみ、未ログインでも許可)
+  # -> view側で出し分けている。
+  
+  before_action :require_user_logged_in, only: [:create, :edit, :show, :update, :destroy]
+  
   def index
-    # get all tasks
-    @tasks = Task.all
+    #@tasks = Task.all
+    
+    # ユーザに対するタスクを取得
+    if logged_in?
+      @user = current_user
+      @tasks = current_user.tasks.order('created_at DESC').page(params[:page])
+    else
+      #　ログインフォームの出力処理
+    end
+    
   end
 
   def show
@@ -13,7 +27,9 @@ class TasksController < ApplicationController
   end
 
   def create
-    @task = Task.new(task_params)
+    # @task = Task.new(task_params)
+    
+    @task = current_user.tasks.build(task_params)
 
     if @task.save
       flash[:success] = 'Task が正常に投稿されました'
