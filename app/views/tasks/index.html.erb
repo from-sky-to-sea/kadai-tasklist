@@ -1,24 +1,67 @@
-<h1>タスク一覧</h1>
-
-<% if @tasks.any? %>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>id</th>
-        <th>タスク</th>
-        <th>ステータス</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @tasks.each do |task| %>
+<h1>タスクリスト</h1>
+<!-- タスク一覧 -->
+<% if logged_in? %>
+  <% if @tasks.any? %>
+    <table class="table table-striped">
+      <thead>
         <tr>
-          <td><%= link_to task.id, task %></td>
-          <td><%= task.content %></td>
-          <td><%= task.status %></td>
+          <th>id</th>
+          <th>タスク</th>
+          <th>ステータス</th>
         </tr>
+      </thead>
+      <tbody>
+        <% @tasks.each do |task| %>
+          <tr>
+            <td><%= link_to task.id, task %></td>
+            <td><%= task.content %></td>
+            <td><%= task.status %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+  <%= link_to '新規タスクの投稿', new_task_path , class: "btn btn-primary" %>
+  
+<% else %>
+<!-- ログインフォーム -->
+
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+  
+      <%= form_for(:session, url: login_path) do |f| %>
+  
+        <div class="form-group">
+          <%= f.label :email, 'Email' %>
+          <%= f.email_field :email, class: 'form-control' %>
+        </div>
+  
+        <div class="form-group">
+          <%= f.label :password, 'Password' %>
+          <%= f.password_field :password, class: 'form-control' %>
+        </div>
+  
+        <%= f.submit 'Log in', class: 'btn btn-primary btn-block' %>
       <% end %>
-    </tbody>
-  </table>
+  
+      <p>New user? <%= link_to 'Sign up now!', signup_path %></p>
+    </div>
+  </div>
 <% end %>
 
-<%= link_to '新規タスクの投稿', new_task_path , class: "btn btn-primary" %>
+
+
+
+
+<!-- ここの振る舞いを変えればいけそう。
+未ログイン
+-page
+--ログインフォーム (-> 新規作成フォーム)
+-nav
+--login,signup
+ログイン
+-page
+--タスク一覧
+-nav
+--新規タスク
+-->
