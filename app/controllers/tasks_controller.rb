@@ -2,8 +2,10 @@ class TasksController < ApplicationController
   
   # index(一覧表示orユーザに対するタスク取得のみ、未ログインでも許可)
   # -> view側で出し分けている。
-  
-  before_action :require_user_logged_in, only: [:create, :edit, :show, :update, :destroy]
+
+  before_action :require_user_logged_in, only: [:new, :create]
+  before_action :set_task, only: [:show, :edit, :update, :destroy]
+  before_action :correct_user, only: [:show, :edit, :update, :destroy]
   
   def index
     #@tasks = Task.all
@@ -15,11 +17,9 @@ class TasksController < ApplicationController
     else
       #　ログインフォームの出力処理
     end
-    
   end
 
   def show
-    @task = Task.find(params[:id])
   end
 
   def new
@@ -41,11 +41,9 @@ class TasksController < ApplicationController
   end
 
   def edit
-    @task = Task.find(params[:id])
   end
 
   def update
-    @task = Task.find(params[:id])
 
     if @task.update(task_params)
       flash[:success] = 'Task は正常に更新されました'
@@ -57,7 +55,6 @@ class TasksController < ApplicationController
   end
 
   def destroy
-    @task = Task.find(params[:id])
     @task.destroy
 
     flash[:success] = 'Task は正常に削除されました'
@@ -70,5 +67,13 @@ class TasksController < ApplicationController
   
   def task_params
     params.require(:task).permit(:content, :status)
+  end
+  
+  def set_task
+    @task = Task.find(params[:id])
+  end
+  
+  def correct_user
+    redirect_to root_url if @task.user != current_user
   end
 end
